@@ -256,6 +256,19 @@ footer{ text-align:center; color:var(--muted); margin-top:40px; padding:20px 0; 
 
   .about-box{ padding:16px; font-size:15px; }
   .connect-links{ flex-direction:column; align-items:center; } .connect-item{ width:90%; justify-content:center; }
+
+  /* MOBILE DECK (new) */
+  .mobile-deck{ display:block; margin:14px 0; position:relative; }
+  .mobile-deck .viewport{ overflow:hidden; border-radius:12px; }
+  .mobile-deck .track{ display:flex; transition:transform .32s cubic-bezier(.2,.9,.2,1); }
+  .mobile-deck .slide{ min-width:100%; box-sizing:border-box; padding:16px; }
+  .mobile-deck .slide .project-card{ width:100%; box-shadow: 0 10px 30px rgba(0,0,0,0.18); }
+
+  .mobile-controls{ display:flex; justify-content:center; gap:10px; align-items:center; margin-top:8px; }
+  .mobile-dot{ width:8px; height:8px; border-radius:50%; background:rgba(255,255,255,0.18); }
+  .mobile-dot.active{ background:var(--text); }
+  .mobile-arrow{ background:transparent; border: none; padding:8px; border-radius:10px; display:flex; align-items:center; justify-content:center; }
+  .mobile-arrow svg{ width:18px; height:18px; }
 }
 /* GLOBAL LIQUID GLASS FILTER */
 svg#liquidFilters{position:absolute;width:0;height:0;}
@@ -340,7 +353,20 @@ svg#liquidFilters{position:absolute;width:0;height:0;}
   <section id="projects" class="fade-up" aria-labelledby="projects-title">
     <h2 id="projects-title">Projects</h2>
 
-    <div class="projects-viewport" id="projectsViewport">
+    <!-- MOBILE: Swipeable deck (visible on small screens) -->
+    <div class="mobile-deck" id="mobileDeck" aria-hidden="false">
+      <div class="viewport glass" id="mobileViewport" aria-label="Projects carousel">
+        <div class="track" id="mobileTrack" role="list"></div>
+      </div>
+      <div class="mobile-controls" id="mobileControls" aria-hidden="false">
+        <button class="mobile-arrow" id="prevBtn" aria-label="Previous project"><svg viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+        <div id="dots" aria-hidden="false" style="display:flex;gap:8px;align-items:center"></div>
+        <button class="mobile-arrow" id="nextBtn" aria-label="Next project"><svg viewBox="0 0 24 24"><path d="M9 6l6 6-6 6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+      </div>
+    </div>
+
+    <!-- Desktop marquee remains (hidden visually on small screens via CSS) -->
+    <div class="projects-viewport" id="projectsViewport" style="display:block;">
       <div class="projects-track" id="projectsTrack" role="list" aria-label="Projects deck">
         <!-- project cards injected by JS -->
       </div>
@@ -378,10 +404,10 @@ svg#liquidFilters{position:absolute;width:0;height:0;}
     </div>
   </section>
 
-  <footer>© 2025 Vishwa Kumar</footer>
+  <footer>©️ 2025 Vishwa Kumar</footer>
 </div>
 
-<!-- project script (same as original) -->
+<!-- project script (same as original) + mobile deck logic -->
 <script>
 const PROJECTS = [
   { title:"PuBOT (Portable Ultra Robot) — WIP", date:"Aug 2025 — Present", desc:"Modular Raspberry Pi robot with conversational AI, sensors & autonomous navigation.", href:"https://github.com/vkumxr/PuBOT---Portable-Ultra-Robot" },
@@ -402,6 +428,71 @@ const PROJECTS = [
   }
   for (const p of PROJECTS) track.appendChild(createCard(p,false));
   for (const p of PROJECTS) track.appendChild(createCard(p,true));
+})();
+
+// MOBILE DECK: build slides, add swipe handling, dots & arrows
+(function(){
+  const mobileDeck = document.getElementById('mobileDeck');
+  const track = document.getElementById('mobileTrack');
+  const dotsWrap = document.getElementById('dots');
+  const prevBtn = document.getElementById('prevBtn');
+  const nextBtn = document.getElementById('nextBtn');
+  let index = 0;
+  let startX = 0, currentX = 0, isDown = false;
+
+  // build slides
+  function makeSlide(p){
+    const slide = document.createElement('div'); slide.className = 'slide';
+    const a = document.createElement('a'); a.className = 'project-card'; a.target = '_blank'; a.rel = 'noopener'; a.href = p.href;
+    const h = document.createElement('h3'); h.textContent = p.title; const s = document.createElement('small'); s.textContent = p.date; const para = document.createElement('p'); para.textContent = p.desc;
+    a.appendChild(h); a.appendChild(s); a.appendChild(para);
+    slide.appendChild(a);
+    return slide;
+  }
+  PROJECTS.forEach((p,i)=>{
+    track.appendChild(makeSlide(p));
+    const dot = document.createElement('button'); dot.className = 'mobile-dot'; dot.setAttribute('aria-label','Go to slide '+(i+1)); dot.dataset.index = i;
+    dot.addEventListener('click', ()=>{ goTo(+dot.dataset.index); });
+    dotsWrap.appendChild(dot);
+  });
+
+  function update(){
+    track.style.transform = `translateX(${ -index * 100 }%)`;
+    Array.from(dotsWrap.children).forEach((d,i)=> d.classList.toggle('active', i===index));
+  }
+  function goTo(i){ index = Math.max(0, Math.min(PROJECTS.length-1, i)); update(); }
+  prevBtn.addEventListener('click', ()=> goTo(index-1));
+  nextBtn.addEventListener('click', ()=> goTo(index+1));
+
+  // touch / pointer support
+  const vp = document.getElementById('mobileViewport');
+  vp.addEventListener('pointerdown', (e)=>{
+    isDown = true; startX = e.clientX; vp.setPointerCapture(e.pointerId);
+    vp.style.touchAction = 'pan-y';
+  });
+  vp.addEventListener('pointermove', (e)=>{
+    if(!isDown) return; currentX = e.clientX; const dx = currentX - startX; track.style.transition = 'none'; track.style.transform = `translateX(${ -index*100 + (dx / vp.clientWidth)*100 }%)`;
+  });
+  vp.addEventListener('pointerup', (e)=>{
+    if(!isDown) return; isDown = false; track.style.transition = ''; const dx = e.clientX - startX; if(Math.abs(dx) > vp.clientWidth*0.18){ if(dx < 0) goTo(index+1); else goTo(index-1); } else update();
+  });
+  // mouse leave/cancel
+  vp.addEventListener('pointercancel', ()=>{ isDown=false; update(); });
+
+  // keyboard accessibility
+  vp.tabIndex = 0; vp.addEventListener('keydown', (e)=>{ if(e.key === 'ArrowLeft') goTo(index-1); if(e.key === 'ArrowRight') goTo(index+1); });
+
+  // initialize
+  update();
+
+  // hide mobile deck on wide screens (keeps DOM but hidden via CSS). Also pause desktop marquee for narrow screens.
+  function adapt(){
+    const isMobile = window.matchMedia('(max-width:768px)').matches;
+    const desktopTrack = document.getElementById('projectsTrack');
+    if(isMobile){ mobileDeck.style.display = 'block'; if(desktopTrack) desktopTrack.parentElement.style.display = 'none'; }
+    else { mobileDeck.style.display = 'none'; if(desktopTrack) desktopTrack.parentElement.style.display = 'block'; }
+  }
+  adapt(); window.addEventListener('resize', adapt);
 })();
 
 // existing observers, marquee, theme toggle, mobile deck left intact (no changes)
