@@ -14,9 +14,9 @@ timezone: Asia/Calcutta
 # jekyll-seo-tag settings › https://github.com/jekyll/jekyll-seo-tag/blob/master/docs/usage.md
 # ↓ --------------------------
 
-title: 0xSairaj # the main title
+title: Vishwa # the main title
 
-tagline: Focus, Learn, Detach, Repeat! # it will display as the subtitle
+tagline: Learn, Break, Understand, Repeat! # it will display as the subtitle
 
 description: >- # used by seo meta and the atom feed
   A space where I share ctf writeups, red team insights, and my journey through the world of hacking and cybersecurity.
@@ -24,24 +24,24 @@ description: >- # used by seo meta and the atom feed
 
 # Fill in the protocol & hostname for your site.
 # E.g. 'https://username.github.io', note that it does not end with a '/'.
-url: "https://sai3aj.github.io"
+url: "https://vkumxr.github.io"
 
 github:
-  username: sai3aj # change to your GitHub username
+  username: vkumxr # change to your GitHub username
 
 twitter:
-  username: 0xDekuSec # change to your Twitter username
+  username: vkumxrr # change to your Twitter username
 
 social:
   # Change to your full name.
   # It will be displayed as the default author of the posts and the copyright owner in the Footer
-  name: 0xSairaj
-  email: sairajsbarve@gmail.com # change to your email address
+  name: Vishwa Kumar Venkateswaran
+  email: vishwakumarv05@gmail.com # change to your email address
   links:
     # The first element serves as the copyright owner's link
-    - https://x.com/0xDekuSec # change to your Twitter homepage
-    - https://github.com/sai3aj # change to your GitHub homepage
-    - https://www.linkedin.com/in/sairaj-barve-85713b264/
+    - https://x.com/vkumxrr # change to your Twitter homepage
+    - https://github.com/vkumxr # change to your GitHub homepage
+    - https://www.linkedin.com/in/vishwakumarv/
     # Uncomment below to add more social links
     # - https://www.facebook.com/username
 
