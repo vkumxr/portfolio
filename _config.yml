@@ -16,7 +16,7 @@ timezone: Asia/Calcutta
 
 title: Vishwa # the main title
 
-tagline: Learn, Break, Understand, Repeat! # it will display as the subtitle
+tagline: "Learn, Break, Understand, Repeat!"
 
 description: >- # used by seo meta and the atom feed
   A space where I share ctf writeups, red team insights, and my journey through the world of hacking and cybersecurity.
